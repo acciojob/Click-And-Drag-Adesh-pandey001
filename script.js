@@ -5,26 +5,27 @@ let selectedCube = null;
 let offsetX = 0;
 let offsetY = 0;
 
-// Initialize cubes with grid positioning
-cubes.forEach((cube, index) => {
-  const col = index % 4;
-  const row = Math.floor(index / 4);
-  cube.style.left = `${10 + col * 80}px`;  // including gap
-  cube.style.top = `${10 + row * 80}px`;
-});
+// Set initial positions manually (2x2 grid layout)
+const positions = [
+  { left: 10, top: 10 },
+  { left: 90, top: 10 },
+  { left: 10, top: 90 },
+  { left: 90, top: 90 }
+];
 
-// Mouse down
-cubes.forEach(cube => {
+cubes.forEach((cube, index) => {
+  cube.style.left = `${positions[index].left}px`;
+  cube.style.top = `${positions[index].top}px`;
+
   cube.addEventListener('mousedown', (e) => {
     selectedCube = cube;
-    offsetX = e.clientX - cube.offsetLeft;
-    offsetY = e.clientY - cube.offsetTop;
-    cube.style.zIndex = 1000; // Bring to front
+    const rect = cube.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
     cube.style.cursor = 'grabbing';
   });
 });
 
-// Mouse move
 document.addEventListener('mousemove', (e) => {
   if (!selectedCube) return;
 
@@ -35,7 +36,7 @@ document.addEventListener('mousemove', (e) => {
   let x = e.clientX - containerRect.left - offsetX;
   let y = e.clientY - containerRect.top - offsetY;
 
-  // Boundary constraints
+  // Constrain within container
   x = Math.max(0, Math.min(container.clientWidth - cubeWidth, x));
   y = Math.max(0, Math.min(container.clientHeight - cubeHeight, y));
 
@@ -43,7 +44,6 @@ document.addEventListener('mousemove', (e) => {
   selectedCube.style.top = `${y}px`;
 });
 
-// Mouse up
 document.addEventListener('mouseup', () => {
   if (selectedCube) {
     selectedCube.style.cursor = 'grab';
